@@ -549,3 +549,9 @@ footer .legal a{text-decoration:underline}
 .opr th,.opr td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 .opr th{width:38%;font-weight:600;color:var(--ink2)}
 @media (max-width:560px){.opr th,.opr td{display:block;width:auto;padding:2px 0}.opr th{padding-top:10px;border:0}}
+.sizeseas{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.sizeseas>div{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:10px 12px;border:2px solid var(--ink);border-radius:var(--r2,14px);background:#fff}
+.sizeseas b{flex:1 1 100%;font-family:var(--disp);font-size:1.1rem}
+.sizeseas b a{text-decoration:none}
+.sizeseas>div>a{font-size:.9rem;text-decoration:none;color:var(--modra)}
+.sizeseas small{color:var(--ink3)}

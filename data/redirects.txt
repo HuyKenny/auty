@@ -8,6 +8,8 @@
 /kategorie-produktu/celorocni/ /celorocni-pneumatiky/ 301
 /kategorie-produktu/celorocni-pneu/ /celorocni-pneumatiky/ 301
 /kategorie-produktu/snehove-retezy/ /zimni-pneumatiky/ 301
+/kategorie-produktu/alu-kola/ /alu-kola/ 301
+/kategorie-produktu/disky/ /alu-kola/ 301
 /kategorie-produktu/* /pneumatiky/ 301
 /obchod/ /pneumatiky/ 301
 /obchod/* /pneumatiky/ 301

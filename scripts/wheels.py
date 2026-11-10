@@ -374,7 +374,11 @@ def page(S, path, kind, key, items, pages, shops_n):
            if kind == "car" and first else "")
     body = pre + (f'<div class="layout"><aside class="card wside">{filt}<details class="wmore"><summary>Další filtry: šířka, ET, středový otvor, cena</summary><form id="wff" class="wff">{facets(items, alu)}'
             f'<button class="btn btn--g wreset" type="button" hidden>Zrušit filtry</button></form></details></aside><div>{head}{grid}</div></div>' + (f'<div class="prose hubtext">{HUB_GUIDE}</div>' if first and kind in ("hub", "steel", "rim", "pcd") else "") + (faq_html if first else ""))
-    title = {"hub": f"Alu kola a hliníkové disky na auto od {R.kc(lo)} | auty.cz", "steel": f"Plechové disky na auto od {R.kc(lo)} | auty.cz"}.get(kind) or f"{h1} – ceny od {R.kc(lo)} | auty.cz"
+    plain = pl.replace("×", "x") if pl else ""
+    title = {"hub": f"Alu kola a hliníkové disky na auto od {R.kc(lo)} | auty.cz", "steel": f"Plechové disky na auto od {R.kc(lo)} | auty.cz",
+             "rim": f"Alu kola a alu disky R{r} ({r}\") – ceny od {R.kc(lo)} | auty.cz", "steelrim": f"Plechové disky R{r} ({r}\") – ceny od {R.kc(lo)} | auty.cz",
+             "pcd": f"Alu kola {pl} ({plain}) – disky s roztečí {pl} od {R.kc(lo)} | auty.cz",
+             "rimpcd": f"Alu kola {pl} R{r} ({plain} r{r}) – ceny od {R.kc(lo)} | auty.cz"}.get(kind) or f"{h1} – ceny od {R.kc(lo)} | auty.cz"
     desc = f"{h1}: {len(items)} {'kol' if alu else 'disků'} z {'e-shopů' if shops_n > 1 else 'e-shopu'}, seřazeno podle ceny od {R.kc(lo)}. Filtr podle průměru, rozteče a značky."
     crumbs = [("auty.cz", "/"), (noun, base)] + ([(h1.replace(noun + " ", ""), path)] if path != base else [])
     if kind == "car":

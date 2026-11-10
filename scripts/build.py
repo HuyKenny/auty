@@ -232,6 +232,7 @@ def main():
     S.brand_season = set(brand_season)
     S.model_links = {mk: (model_url(ps[0]), low(ps), len(ps)) for mk, ps in by_model.items()}
     S.wpages = set(wpages)
+    S.dim_season = set(dim_season)
     S.specials = set(specials)
     S.wheel_n = {"alu": sum(1 for x in wheels if not x["steel"]), "steel": sum(1 for x in wheels if x["steel"])}
     S.car_wheels = json.load(open(APP / "data/car_wheels.json"))["wheels"]
@@ -347,6 +348,22 @@ def main():
 
     # ---------------- sitemaps, robots, redirects, headers, IndexNow key
     sm_files = []
+    allp = {p for g in out.sitemap.values() for p in g}
+    prio = list(out.sitemap.get("pages", []))
+    want = []
+    for d, ps in sorted(dim_pages.items(), key=lambda kv: -len(kv[1]))[:250]:
+        want += [f"/pneumatiky/{d}/"] + [f"/pneumatiky/{d}/{ss}/" for ss in ("zimni", "letni", "celorocni")]
+    want += [f"/brandstore/{b}/" for b in sorted(by_brand, key=lambda b: -len(by_brand[b]))[:80]]
+    want += [p for p in out.sitemap.get("listings", []) if p.count("/") <= 3 and not p.startswith(("/pneumatiky/", "/brandstore/", "/produkt/"))]
+    seen_p = set(prio)
+    for p in want:
+        if p in allp and p not in seen_p:
+            seen_p.add(p)
+            prio.append(p)
+    body = "".join(f"<url><loc>{BASE}{p}</loc><lastmod>{state['lastmod'].get(p, TODAY.isoformat())}</lastmod></url>" for p in prio[:45000])
+    out.write("sitemap-priority.xml", f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>')
+    sm_files.append("sitemap-priority.xml")
+    log(f"priority sitemap: {len(prio)} URLs")
     for group, paths in out.sitemap.items():
         for i in range(0, len(paths), 40000):
             name = f"sitemap-{group}-{i // 40000 + 1}.xml"
@@ -796,7 +813,7 @@ def dims_index(S, dim_pages):
         items = sorted(by_rim[r], key=lambda x: (int(x[1][0]["w"]), int(x[1][0]["p"])))
         body += f"<h2>Ráfek R{r}</h2><ul class=\"pills\">" + "".join(
             f'<li><a href="/pneumatiky/{d}/">{T.dim_label(ps[0]["w"], ps[0]["p"], ps[0]["r"])} <small>{len(ps)}</small></a></li>' for d, ps in items) + "</ul>"
-    return S.layout("/pneumatiky/", "Rozměry pneumatik – srovnání cen podle rozměru | auty.cz",
+    return S.layout("/pneumatiky/", "Rozměry pneumatik – přehled všech rozměrů pneu a srovnání cen | auty.cz",
                     f"Všech {len(dim_pages)} rozměrů pneumatik od R10 po R24 se srovnáním cen v českých e-shopech.", body, [("auty.cz", "/"), ("Pneumatiky", "/pneumatiky/")])
 
 
@@ -1416,6 +1433,17 @@ def home_body(S, products, dim_pages, by_brand, brand_name, articles):
         f'<li><a class="scard" href="/{slug}/"><img src="/img/ui/sezona-{img}.webp" alt="" width="120" height="130" loading="lazy"><span><b>{n}</b>'
         f'<p>{nf(seas[s])} pneumatik</p>{R.spz(minp.get(s, 0))}</span></a></li>'
         for s, slug, img, n in (("summer", "letni-pneumatiky", "letni", "Letní"), ("winter", "zimni-pneumatiky", "zimni", "Zimní"), ("all", "celorocni-pneumatiky", "celorocni", "Celoroční")))
+    dsz = getattr(S, "dim_season", set())
+    size_season = ""
+    for d, ps in pop[:14]:
+        lbl = T.dim_label(ps[0]["w"], ps[0]["p"], ps[0]["r"])
+        links = []
+        for se, nm in (("summer", "letní"), ("winter", "zimní"), ("all", "celoroční")):
+            sub = [p for p in ps if p["season"] == se]
+            if (d, se) in dsz and sub:
+                links.append(f'<a href="/pneumatiky/{d}/{T.SEASON_SLUG[se]}/" title="{nm.capitalize()} pneu {lbl} od {R.kc(low(sub))}">{nm} <small>od {R.kc(low(sub))}</small></a>')
+        if links:
+            size_season += f'<div><b><a href="/pneumatiky/{d}/">{lbl}</a></b>{"".join(links)}</div>'
     bs = sorted(by_brand, key=lambda b: -len(by_brand[b]))[:16]
     brands = "".join(f'<a class="brandtile" href="/brandstore/{b}/"><i style="background:{R.SHOP_COLORS[i % len(R.SHOP_COLORS)]}">{E(brand_name[b][:2].upper())}</i><span>{E(brand_name[b])}<small>{nf(len(by_brand[b]))} pneumatik</small></span></a>' for i, b in enumerate(bs))
     return f"""<section class="hero"><div class="wrap"><div>
@@ -1433,8 +1461,10 @@ def home_body(S, products, dim_pages, by_brand, brand_name, articles):
 <h2>Největší úspora</h2><p class="muted" style="margin-top:-.4em">Pneumatiky, u kterých je mezi obchody největší rozdíl v ceně za kus.</p><ul class="pgrid-c">{"".join(S.prow(p) for p in sav)}</ul>
 <h2>Oblíbené rozměry</h2><ul class="pills">{"".join(f'<li><a href="/pneumatiky/{d}/">{T.dim_label(ps[0]["w"], ps[0]["p"], ps[0]["r"])} <small>{len(ps)}</small></a></li>' for d, ps in pop[:30])}</ul>
 <p style="margin-top:14px"><a class="lnk" href="/pneumatiky/">Všechny rozměry →</a></p>
+<h2>Pneumatiky podle rozměru a sezóny</h2><p class="muted" style="margin-top:-.4em">Nejčastější rozměry rovnou v letní, zimní a celoroční verzi.</p><div class="sizeseas">{size_season}</div>
 <h2>Podle sezóny</h2><ul class="scards">{scards}</ul>
 <h2>Značky</h2><div class="brands">{brands}</div><p style="margin-top:14px"><a class="lnk" href="/brandstore/">Všech {len(by_brand)} značek →</a></p>
+<h2>Disky, testy a rady</h2><ul class="pills"><li><a href="/alu-kola/">Alu kola</a></li><li><a href="/plechove-disky/">Plechové disky</a></li><li><a href="/roztec-kol/">Rozteč kol podle auta</a></li><li><a href="/levne-pneumatiky/">Levné pneumatiky</a></li><li><a href="/vyprodej-pneumatik/">Výprodej pneumatik</a></li><li><a href="/testy-pneumatik/">Testy pneumatik 2026</a></li><li><a href="/test-zimnich-pneumatik-2026/">Test zimních pneumatik</a></li><li><a href="/povinnost-zimnich-pneumatik/">Kdy mít zimní pneu</a></li><li><a href="/snehove-retezy/">Sněhové řetězy</a></li><li><a href="/prezuti-pneu-cena/">Cena přezutí</a></li><li><a href="/hloubka-dezenu/">Hloubka dezénu</a></li><li><a href="/eu-stitek-pneumatik/">Štítek EU</a></li></ul>
 <h2>Jak srovnáváme</h2><ol class="steps"><li><img src="/img/ic/pneu.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Stahujeme ceny</h3><p class="muted">Několikrát týdně načteme nabídky z českých e-shopů s pneumatikami.</p></div></li>
 <li><img src="/img/ic/cena.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Ověříme, že jde o stejný kus</h3><p class="muted">Porovnáváme jen opravdu stejnou pneumatiku — stejný vzorek, rozměr i indexy, ne jen podobný název.</p></div></li>
 <li><img src="/img/ic/obchod.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Vy vyberete obchod</h3><p class="muted">Kliknutím přejdete přímo do e-shopu. Cena je stejná, jako kdybyste tam šli sami.</p></div></li></ol>
