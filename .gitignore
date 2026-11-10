@@ -1,0 +1,14 @@
+dist/
+data/raw/
+data/state/
+node_modules/
+__pycache__/
+*.pyc
+.wrangler/
+
+# public repo: never commit keys or state (state lives encrypted in the 'state' release)
+.env*
+*credentials*
+*.enc
+*.tar.gz
+.dev.vars*

@@ -1,0 +1,144 @@
+{
+  "shops": [
+    {
+      "id": "pneuboss",
+      "name": "Pneuboss.cz",
+      "domain": "pneuboss.cz",
+      "network": "cj",
+      "advertiser": "5300173",
+      "currency": "CZK",
+      "logo": "/img/shops/pneuboss.svg"
+    },
+    {
+      "id": "bestdrive",
+      "name": "BestDrive.cz",
+      "domain": "bestdrive.cz",
+      "network": "cj",
+      "advertiser": "7449050",
+      "currency": "CZK",
+      "note": "CJ link points to the homepage",
+      "logo": "/img/shops/bestdrive.webp"
+    },
+    {
+      "id": "dobrepneu",
+      "name": "DobrePneu.cz",
+      "domain": "dobrepneu.cz",
+      "network": "affiliateport",
+      "offer": 675,
+      "asset": 511,
+      "feed": "https://dobrepneu.cz/heureka.xml",
+      "logo": "/img/shops/dobrepneu.svg",
+      "kind": "both"
+    },
+    {
+      "id": "nejlevnejsipneu",
+      "name": "NejlevnějšíPneu.cz",
+      "domain": "nejlevnejsipneu.cz",
+      "network": "affiliateport",
+      "offer": 226,
+      "asset": 347,
+      "feed": "https://www.nejlevnejsipneu.cz/export/5dmgooglecz.php"
+    },
+    {
+      "id": "nejvyhodnejsipneu",
+      "name": "NejvýhodnějšíPneu.cz",
+      "domain": "nejvyhodnejsipneu.cz",
+      "network": "affiliateport",
+      "offer": 465,
+      "asset": 1507,
+      "feed": "https://www.nejvyhodnejsipneu.cz/exporty/feed-heureka.xml"
+    },
+    {
+      "id": "tirendo",
+      "name": "Tirendo.cz",
+      "domain": "tirendo.cz",
+      "network": "dognet",
+      "chid": "IgeQs2Wh",
+      "feed_keys": [
+        "dognet-a",
+        "dognet-b",
+        "dognet-c"
+      ],
+      "domain_filter": true,
+      "logo": "/img/shops/tirendo.webp",
+      "logo_bg": "#0E2A47"
+    },
+    {
+      "id": "pneushop",
+      "name": "Pneushop.cz",
+      "domain": "pneushop.cz",
+      "network": "dognet",
+      "chid": "IgeQs2Wh",
+      "feed_keys": [
+        "dognet-a",
+        "dognet-b",
+        "dognet-c"
+      ],
+      "domain_filter": true,
+      "logo": "/img/shops/pneushop.webp"
+    },
+    {
+      "id": "originalnipneu",
+      "name": "OriginálníPneu.cz",
+      "domain": "originalnipneu.cz",
+      "network": "ehub",
+      "a_bid": "a0f5919e",
+      "feed_key": "originalnipneu",
+      "logo": "/img/shops/originalnipneu.webp",
+      "logo_bg": "#121A26"
+    },
+    {
+      "id": "pneu-kvalitne",
+      "name": "Pneu-kvalitne.cz",
+      "domain": "pneu-kvalitne.cz",
+      "network": "ehub",
+      "a_bid": "d0636152",
+      "feed_key": "pneu-kvalitne",
+      "logo": "/img/shops/pneu-kvalitne.webp"
+    },
+    {
+      "id": "moto-kvalitne",
+      "name": "Moto-kvalitne.cz",
+      "domain": "moto-kvalitne.cz",
+      "network": "ehub",
+      "a_bid": "1f055856",
+      "feed_key": "moto-kvalitne",
+      "logo": "/img/shops/moto-kvalitne.webp"
+    },
+    {
+      "id": "atstrutnov",
+      "name": "ATS Trutnov",
+      "domain": "eshop.atstrutnov.cz",
+      "network": "ehub",
+      "a_bid": "6cceb784",
+      "feed_key": "atstrutnov",
+      "enabled": false,
+      "note": "feed is car parts only (216k items, ~5 tyres) - skipped to keep the build short"
+    },
+    {
+      "id": "alukola",
+      "name": "Alukola-obchod.cz",
+      "domain": "alukola-obchod.cz",
+      "network": "ehub",
+      "a_bid": "f3555e70",
+      "feed_key": "alukola",
+      "enabled": true,
+      "note": "alloy wheels only (14k items, ~20 tyres): feeds /alu-kola/, ignored by the tyre catalogue",
+      "kind": "wheels"
+    },
+    {
+      "id": "allegro",
+      "name": "Allegro.cz",
+      "domain": "allegro.cz",
+      "network": "cj",
+      "advertiser": "6464420",
+      "currency": "CZK",
+      "keywords": [
+        "pneumatiky"
+      ],
+      "path_filter": "Pneumatiky a disky > Pneumatiky",
+      "note": "CJ has no real tyre catalogue for Allegro: 7 min of queries for ~670 trailer/scooter tyres (2026-11-08); AffiliatePort 1816 has banners only",
+      "enabled": false
+    }
+  ]
+}
