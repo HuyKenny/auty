@@ -31,6 +31,12 @@ GA4 = os.environ.get("GA4_ID", "G-Q7BG14P190")
 INDEXNOW_KEY = os.environ.get("INDEXNOW_KEY", "")
 FILE_LIMIT = 100_000
 HUB_JSON_ITEMS = 2000        # hub pages load only the most compared tyres; size/brand picks load their own small JSON
+# Content-Security-Policy: scripts only from us + GA4 (loaded after consent); 'unsafe-inline' is needed for Cloudflare's injected bot-detection snippet
+# and the speculationrules block; no user input exists on the site. Tested in headless Chrome incl. GA4 after consent (0 violations).
+CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline' 'inline-speculation-rules' https://www.googletagmanager.com https://challenges.cloudflare.com; "
+       "style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; "
+       "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://challenges.cloudflare.com; "
+       "frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests")
 MAX_PAGES = 30                # most pages per listing (24 tyres each); lowered automatically if the file budget needs it
 FILE_BUDGET = 95_000          # keep 5 % headroom under the Workers static-assets limit
 E = R.E
@@ -233,6 +239,8 @@ def main():
     S.model_links = {mk: (model_url(ps[0]), low(ps), len(ps)) for mk, ps in by_model.items()}
     S.wpages = set(wpages)
     S.dim_season = set(dim_season)
+    S.brand_dim = set(brand_dim)
+    S.dim_set = set(dim_pages)                        # size pages that exist (>= 2 products): never link to the others
     S.specials = set(specials)
     S.wheel_n = {"alu": sum(1 for x in wheels if not x["steel"]), "steel": sum(1 for x in wheels if x["steel"])}
     S.car_wheels = json.load(open(APP / "data/car_wheels.json"))["wheels"]
@@ -386,7 +394,11 @@ def main():
               "/favicon*\n  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000\n"
               "/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n"
               "  Strict-Transport-Security: max-age=31536000; includeSubDomains\n  X-Frame-Options: SAMEORIGIN\n"
-              "  Permissions-Policy: camera=(), microphone=(), geolocation=()\n")
+              "  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=(), browsing-topics=()\n"
+              "  Cross-Origin-Opener-Policy: same-origin\n  X-Permitted-Cross-Domain-Policies: none\n"
+              f"  Content-Security-Policy: {CSP}\n"
+              f"  Link: </assets/{css_name}>; rel=preload; as=style\n  Link: </fonts/figtree-1.woff2>; rel=preload; as=font; type=\"font/woff2\"; crossorigin\n"
+              "  Link: </fonts/barlow-c-700.woff2>; rel=preload; as=font; type=\"font/woff2\"; crossorigin\n")
     if INDEXNOW_KEY:
         out.write(f"{INDEXNOW_KEY}.txt", INDEXNOW_KEY)
 
@@ -553,7 +565,7 @@ def product_page(S, p, by_model, by_dim, dim_pages, brand_dim, model_url):
 <h2>Srovnání cen v obchodech</h2>{offer_rows(S, p)}<p class="muted" style="font-size:.85rem;margin-top:8px">Ceny za kus včetně DPH, bez dopravy a montáže. Aktualizujeme je několikrát týdně; před nákupem je ověřte v obchodě.</p>
 </div></div><h2>O pneumatice</h2>{product_text(S, p)}{fits(S, p["dim"])}<h2>Parametry</h2>{table}{eu}{sizes}{alts}
 <div class="buybar" id="buybar" hidden><span>{R.kc(best["price"])}<small>{"nejlevněji ze " + R.shops_gen(n) if n > 1 else E(S.shops[best["shop"]]["name"])}</small></span><a class="btn" href="{E(best["go"])}" {S.go_attrs(best["shop"])}>Koupit u {E(S.shops[best["shop"]]["name"])}</a></div>"""
-    title = f"{name} – srovnání cen od {R.kc(best['price'])} | auty.cz"
+    title = f"{name} – cena od {R.kc(best['price'])} | auty.cz"
     desc = (f"{name}: {f"srovnání cen v {n} obchodech" if n > 1 else 'cena'} od {R.kc(best['price'])}. "
             f"{T.SEASON_CZ[p['season']].capitalize()} pneumatika {dl}, parametry{', štítek EU' if p['eu'] else ''} a další rozměry.")
     ld = {"@context": "https://schema.org", "@type": "Product", "name": name, "brand": {"@type": "Brand", "name": p["brand"]}, "url": BASE + path,
@@ -758,7 +770,7 @@ def brand_page(S, b, ps, by_model, brand_dim, mstate, model_url):
     body += "<h2 style=\"margin-top:0\">Vzorky</h2><ul class=\"pills\">" + "".join(
         f'<li><a href="{model_url(x[0])}">{R.SEASON_ICON[x[0]["season"]]} {E(x[0]["model"])} <small>{len(x)}</small></a></li>' for x in ml[:80]) + "</ul>"
     dim_opts = [(d, dim_lbl(d), n, f"/brandstore/{b}/{d}/" if (b, d) in brand_dim else f"/pneumatiky/{d}/")
-                for d, n in Counter(p["dim"] for p in ps).most_common(150)]
+                for d, n in Counter(p["dim"] for p in ps).most_common(150) if d in S.dim_set]
     body += "<h2>Všechny pneumatiky</h2>" + S.listing(ps, f"/data/b/{b}.json", show_brand=False, dims=dim_opts, lazy=len(ps) > 1500)
     kinds = [T.SEASON_CZ[x] for x in ("summer", "winter", "all") if seas.get(x)]
     title = f"Pneumatiky {brand} – {', '.join(kinds[:-1]) + ' i ' + kinds[-1] if len(kinds) > 1 else kinds[0]} od {R.kc(low(ps))} | auty.cz"
@@ -799,7 +811,7 @@ def model_page(S, ps, model_url, dim_pages):
                 f", hluk {min(e['db'] for e in eus)}–{max(e['db'] for e in eus)} dB."
     body += "</p><h2>Rozměry a ceny</h2><ul class=\"pgrid-c\">" + "".join(S.prow(p) for p in ps[:150]) + "</ul>"
     body += f'<p style="margin-top:16px"><a class="btn btn--g" href="/brandstore/{x0["bslug"]}/">Další vzorky {E(x0["brand"])}</a></p>'
-    title = f"{name} – srovnání cen od {R.kc(low(ps))} ({len(ps)} {R.plural(len(ps), 'rozměr', 'rozměry', 'rozměrů')}) | auty.cz"
+    title = f"{name} – ceny od {R.kc(low(ps))} ({len(ps)} {R.plural(len(ps), 'rozměr', 'rozměry', 'rozměrů')}) | auty.cz"
     desc = f"{name}: {T.SEASON_CZ[seas]} pneumatika, {len(ps)} rozměrů, srovnání cen v českých e-shopech od {R.kc(min(p['price'] for p in ps))}."
     return S.layout(model_url(x0), title, desc, body, [("auty.cz", "/"), ("Značky", "/brandstore/"), (x0["brand"], f"/brandstore/{x0['bslug']}/"), (x0["model"], model_url(x0))])
 
@@ -1107,7 +1119,8 @@ def brand_season_page(S, b, season, items, brand_name, model_url, dim_pages):
         f'<li><a href="{model_url(first_p[k])}">{E(first_p[k]["model"])} <small>{n}</small></a></li>' for k, n in models.most_common(40)) + "</ul>") if first else ""
     info = BRAND_INFO.get(b)
     prof = (f'{E(brand)} je {({"p": "prémiová značka", "m": "značka střední třídy", "b": "levná značka"})[R.tier(b)]} ({info[0]}{", " + info[1] if info[1] else ""}). {info[2]} ') if info else ""
-    dim_opts = [(d, dim_lbl(d), n, f"/brandstore/{b}/{d}/") for d, n in Counter(p["dim"] for p in items).most_common(120) if d in dim_pages]
+    dim_opts = [(d, dim_lbl(d), n, f"/brandstore/{b}/{d}/" if (b, d) in S.brand_dim else f"/pneumatiky/{d}/")
+                for d, n in Counter(p["dim"] for p in items).most_common(120) if d in dim_pages]
     sib = "".join(f'<li><a href="/brandstore/{b}/{T.SEASON_SLUG[s]}/">{T.SEASON_CZ[s].capitalize()} {E(brand)}</a></li>' for s in ("summer", "winter", "all") if s != season)
     body = (pills + S.listing(items, f"/data/h/bs-{b}-{ss}.json", show_brand=False, dims=dim_opts, fixed_season=season)
             + (f'<ul class="pills" style="margin-top:18px">{sib}<li><a href="/brandstore/{b}/">Všechny pneumatiky {E(brand)}</a></li>'
@@ -1126,11 +1139,11 @@ def rim_season_page(S, season, r, items, brand_name, dim_season):
     lo = low(items)
     dims = Counter(p["dim"] for p in items)
     first = not getattr(S, "pg", None) or S.pg[1] == 1
-    pills = ("<h2 style=\"margin-top:0\">Rozměry R" + r + "</h2><ul class=\"pills\">" + "".join(
-        f'<li><a href="/pneumatiky/{d}/{ss + "/" if (d, season) in dim_season else ""}">{dim_lbl(d)} <small>{n}</small></a></li>' for d, n in dims.most_common(40)) + "</ul>") if first else ""
+    pills = ("<h2 style=\"margin-top:0\">Rozměry R" + r + "</h2><ul class=\"pills\">" + "".join([
+        f'<li><a href="/pneumatiky/{d}/{ss + "/" if (d, season) in dim_season else ""}">{dim_lbl(d)} <small>{n}</small></a></li>' for d, n in dims.most_common(60) if d in S.dim_set][:40]) + "</ul>") if first else ""
     bcount = Counter(p["bslug"] for p in items)
     brand_opts = [(b, brand_name[b], n, f"/brandstore/{b}/") for b, n in bcount.most_common()]
-    dim_opts = [(d, dim_lbl(d), n, f"/pneumatiky/{d}/{ss}/" if (d, season) in dim_season else f"/pneumatiky/{d}/") for d, n in dims.most_common(80)]
+    dim_opts = [(d, dim_lbl(d), n, f"/pneumatiky/{d}/{ss}/" if (d, season) in dim_season else f"/pneumatiky/{d}/") for d, n in dims.most_common(100) if d in S.dim_set][:80]
     key = f"r-{ss}-{r}"
     hubmode = len(items) > HUB_JSON_ITEMS
     body = pills + S.listing(items, f"/data/h/{key}.json", dims=dim_opts, brands=brand_opts, lazy=hubmode, fixed_season=season, hub={"season": season} if hubmode else None)
@@ -1173,7 +1186,7 @@ for _ss, _s, _gen, _when in (("zimni", "Zimní", "zimních", "Zimní pneumatiky 
                              ("letni", "Letní", "letních", "Letní pneumatiky jsou nejlevnější na podzim a v zimě, kdy obchody doprodávají sezónu — s nákupem do jara se často vyplatí počkat."),
                              ("celorocni", "Celoroční", "celoročních", "Celoroční pneumatiky prodávají obchody po celý rok, výprodeje starších ročníků ale bývají hlavně na konci sezóny.")):
     SPECIAL[f"vyprodej-pneumatik/{_ss}"] = (
-        f"{_s} pneumatiky ve výprodeji", f"{_s} pneu výprodej – {_s.lower()} pneumatiky se starším DOT levněji",
+        f"{_s} pneumatiky ve výprodeji", f"{_s} pneu výprodej – starší DOT levněji",
         f"{_s} pneumatiky z loňských a starších zásob za výprodejové ceny. U každé vidíte rok výroby (DOT) — nejetá pneumatika do 3–5 let od výroby je v pořádku.",
         f"<h2>Kdy kupovat {_gen} pneumatiky nejlevněji</h2><p>{_when} Rok výroby poznáte podle čtyřčíslí DOT na boku (2324 = 23. týden roku 2024) — "
         f"{lnk('/stari-pneumatik/', 'jak číst DOT')}.</p>",
