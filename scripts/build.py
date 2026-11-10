@@ -1121,7 +1121,7 @@ def brand_season_page(S, b, season, items, brand_name, model_url, dim_pages):
     prof = (f'{E(brand)} je {({"p": "prémiová značka", "m": "značka střední třídy", "b": "levná značka"})[R.tier(b)]} ({info[0]}{", " + info[1] if info[1] else ""}). {info[2]} ') if info else ""
     dim_opts = [(d, dim_lbl(d), n, f"/brandstore/{b}/{d}/" if (b, d) in S.brand_dim else f"/pneumatiky/{d}/")
                 for d, n in Counter(p["dim"] for p in items).most_common(120) if d in dim_pages]
-    sib = "".join(f'<li><a href="/brandstore/{b}/{T.SEASON_SLUG[s]}/">{T.SEASON_CZ[s].capitalize()} {E(brand)}</a></li>' for s in ("summer", "winter", "all") if s != season)
+    sib = "".join(f'<li><a href="/brandstore/{b}/{T.SEASON_SLUG[s]}/">{T.SEASON_CZ[s].capitalize()} {E(brand)}</a></li>' for s in ("summer", "winter", "all") if s != season and (b, s) in S.brand_season)
     body = (pills + S.listing(items, f"/data/h/bs-{b}-{ss}.json", show_brand=False, dims=dim_opts, fixed_season=season)
             + (f'<ul class="pills" style="margin-top:18px">{sib}<li><a href="/brandstore/{b}/">Všechny pneumatiky {E(brand)}</a></li>'
                f'<li><a href="/{ss}-pneumatiky/">Všechny {sname} pneumatiky</a></li></ul>' if first else ""))
