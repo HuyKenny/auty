@@ -542,3 +542,10 @@ input,select,textarea{font-size:16px}
 .stbl table{width:100%}
 .stbl td,.stbl th{vertical-align:middle}
 @media (max-width:699px){.stbl thead{display:none}.stbl tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 8px;padding:10px 12px;border-bottom:1px solid var(--line)}.stbl tr th{grid-column:1/-1;padding:0;width:auto;border:0}.stbl tr td{padding:0;font-size:.88rem;border:0}.stbl td[data-l]::before{content:attr(data-l) ": ";color:var(--ink3)}}
+footer .legal{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.18);font-size:.85rem;color:#c3ccd7}
+footer .legal p{margin:0}
+footer .legal a{text-decoration:underline}
+.opr{width:100%;max-width:560px;border-collapse:collapse}
+.opr th,.opr td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.opr th{width:38%;font-weight:600;color:var(--ink2)}
+@media (max-width:560px){.opr th,.opr td{display:block;width:auto;padding:2px 0}.opr th{padding-top:10px;border:0}}

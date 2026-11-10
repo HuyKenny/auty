@@ -324,6 +324,7 @@ def main():
     out.page("/blog/", blog_page(S, articles), "pages")
     out.page("/testy-pneumatik/", tests_page(S, articles), "pages")
     out.page("/o-webu/", about_page(S, shops, present, offers), "pages")
+    out.page("/kontakt/", contact_page(S), "pages")
     out.page("/ochrana-osobnich-udaju/", privacy_page(S), "pages")
     out.page("/", home_page(S, products, dim_pages, by_brand, brand_name, articles), "pages")
     out.write("404.html", S.layout("/404/", "Stránka nenalezena | auty.cz", "Tahle stránka neexistuje.",
@@ -1534,12 +1535,39 @@ def about_page(S, shops, present, offers):
 <h2>Odkud bereme ceny</h2><p>Několikrát týdně stáhneme produktové feedy těchto obchodů:</p><ul>{rows}</ul>
 <p>Porovnáváme jen stejnou pneumatiku: musí sedět značka, vzorek, rozměr, index nosnosti a rychlosti i značení (XL, run-flat, homologace).</p>
 <h2>Jak na webu vyděláváme</h2><p>Odkazy do obchodů jsou affiliate: když nakoupíte, obchod nám zaplatí malou provizi. Na ceně pro vás se nic nemění a pořadí obchodů určuje jen cena — nejlevnější je vždy nahoře.</p>
+<h2>Kdo web provozuje</h2><p>auty.cz provozuje Ha Duy Huy, IČO 07876823, Praha — viz <a href="/kontakt/">kontakt a provozovatel</a>. Nejsme e-shop: nic neprodáváme a nevybíráme platby.</p>
 <h2>Co ověřit před nákupem</h2><ul><li>Rozměr, index nosnosti a rychlosti podle technického průkazu.</li><li>Cenu dopravy a montáže v obchodě (my ukazujeme cenu za kus s DPH).</li><li>Rok výroby (DOT), pokud je pro vás důležitý.</li></ul></div>"""
     return S.layout("/o-webu/", "Jak srovnáváme ceny pneumatik | auty.cz", "Odkud bereme ceny, jak párujeme pneumatiky mezi obchody a jak web vydělává.", body, [("auty.cz", "/"), ("Jak srovnáváme", "/o-webu/")])
 
 
+
+OPERATOR = {"name": "Ha Duy Huy", "street": "Bartáková 36", "city": "140 00 Praha", "ico": "07876823", "ds": "dxmsrdt", "email": "info@auty.cz"}
+
+
+def contact_page(S):
+    o = OPERATOR
+    body = f"""<div class="prose"><h1>Kontakt a provozovatel webu</h1>
+<p>Web auty.cz provozuje fyzická osoba podnikající podle živnostenského zákona. Údaje o provozovateli jsou veřejně dostupné v registru ARES.</p>
+<table class="opr"><tbody>
+<tr><th>Provozovatel</th><td>{E(o["name"])}</td></tr>
+<tr><th>Sídlo</th><td>{E(o["street"])}, {E(o["city"])}</td></tr>
+<tr><th>IČO</th><td>{o["ico"]} (<a href="https://ares.gov.cz/ekonomicke-subjekty?ico={o["ico"]}" rel="nofollow noopener" target="_blank">ověřit v ARES</a>)</td></tr>
+<tr><th>DPH</th><td>nejsem plátce DPH</td></tr>
+<tr><th>Datová schránka</th><td>{o["ds"]}</td></tr>
+<tr><th>E-mail</th><td><a href="mailto:{o["email"]}">{o["email"]}</a></td></tr>
+</tbody></table>
+<h2>S čím se na nás můžete obrátit</h2>
+<ul><li>Chybná cena nebo chybný údaj u pneumatiky či disku — napište nám odkaz na stránku a my nabídku zkontrolujeme.</li>
+<li>Žádost o odstranění nebo opravu údajů na webu.</li>
+<li>Spolupráce a nabídky obchodů.</li></ul>
+<h2>Čím se auty.cz zabývá a čím ne</h2>
+<p>auty.cz je nezávislý srovnávač cen pneumatik a kol. <b>Nic neprodáváme</b>, nevybíráme platby a neuzavíráme s vámi kupní smlouvu — nákup probíhá v e-shopu, na který vás odkážeme. Reklamace, vrácení zboží a dopravu proto řešíte s prodejcem. Jak srovnáváme a jak web vydělává, popisuje stránka <a href="/o-webu/">Jak srovnáváme</a>; zacházení s údaji najdete v <a href="/ochrana-osobnich-udaju/">zásadách ochrany osobních údajů</a>.</p></div>"""
+    return S.layout("/kontakt/", "Kontakt a provozovatel | auty.cz", "Provozovatel srovnávače auty.cz: Ha Duy Huy, IČO 07876823, Praha. Kontakt, datová schránka a údaje o fungování webu.",
+                    body, [("auty.cz", "/"), ("Kontakt a provozovatel", "/kontakt/")])
+
 def privacy_page(S):
     body = """<div class="prose"><h1>Ochrana osobních údajů a cookies</h1>
+<h2>Správce údajů</h2><p>Správcem je provozovatel webu <b>Ha Duy Huy</b>, Bartáková 36, 140 00 Praha, IČO 07876823, e-mail <a href="mailto:info@auty.cz">info@auty.cz</a>. Další údaje najdete na stránce <a href="/kontakt/">Kontakt a provozovatel</a>.</p>
 <p>Web auty.cz nepoužívá registrace ani formuláře a nesbírá jména, e-maily ani jiné kontaktní údaje.</p>
 <h2>Měření návštěvnosti</h2><p>Jen když v liště souhlasíte, načteme Google Analytics 4 (Google Ireland Ltd.). Měříme, které stránky a obchody vás zajímají; IP adresu Google anonymizuje. Bez souhlasu se žádný měřicí skript nenačte. Souhlas můžete kdykoli změnit odkazem „Nastavení cookies“ v patičce.</p>
 <h2>Odkazy do obchodů</h2><p>Po kliknutí na „Do obchodu“ vás affiliate síť (CJ, AffiliatePort, eHub nebo Dognet) přesměruje do e-shopu a uloží cookie, podle které obchod pozná, že jste přišli od nás. Zpracování v obchodě se řídí jeho podmínkami.</p>
