@@ -1559,7 +1559,9 @@ def contact_page(S):
 <h2>S čím se na nás můžete obrátit</h2>
 <ul><li>Chybná cena nebo chybný údaj u pneumatiky či disku — napište nám odkaz na stránku a my nabídku zkontrolujeme.</li>
 <li>Žádost o odstranění nebo opravu údajů na webu.</li>
-<li>Spolupráce a nabídky obchodů.</li></ul>
+<li>Spolupráce a nabídky obchodů — viz níže.</li></ul>
+<h2>Spolupráce</h2>
+<p>Chcete s námi spolupracovat — obchod s pneumatikami nebo disky, partnerský program, reklama či obsah? Napište na <a href="mailto:{o["email"]}">{o["email"]}</a> nebo se podívejte na <a href="https://huy.cz" rel="noopener" target="_blank">huy.cz</a>, kde najdete nabídku spolupráce.</p>
 <h2>Čím se auty.cz zabývá a čím ne</h2>
 <p>auty.cz je nezávislý srovnávač cen pneumatik a kol. <b>Nic neprodáváme</b>, nevybíráme platby a neuzavíráme s vámi kupní smlouvu — nákup probíhá v e-shopu, na který vás odkážeme. Reklamace, vrácení zboží a dopravu proto řešíte s prodejcem. Jak srovnáváme a jak web vydělává, popisuje stránka <a href="/o-webu/">Jak srovnáváme</a>; zacházení s údaji najdete v <a href="/ochrana-osobnich-udaju/">zásadách ochrany osobních údajů</a>.</p></div>"""
     return S.layout("/kontakt/", "Kontakt a provozovatel | auty.cz", "Provozovatel srovnávače auty.cz: Ha Duy Huy, IČO 07876823, Praha. Kontakt, datová schránka a údaje o fungování webu.",
