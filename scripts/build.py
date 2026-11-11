@@ -562,7 +562,7 @@ def product_page(S, p, by_model, by_dim, dim_pages, brand_dim, model_url):
 <h1>{E(name)}</h1><div class="chips">{S.chips(p)}</div>
 <div class="best" id="bestbox"><div><span class="muted">{"nejnižší cena ze " + R.shops_gen(n) if n > 1 else "cena v obchodě " + E(S.shops[best["shop"]]["name"])}</span><br>{R.spz(best["price"], "", xl=True)}</div><div class="best__shop">{S.shop_logo(best["shop"])}</div>
 <div><a class="btn" href="{E(best["go"])}" {S.go_attrs(best["shop"])}>Koupit u {E(S.shops[best["shop"]]["name"])}</a><br><span class="muted">sada 4 ks od {R.kc(best["price"] * 4)}</span></div></div>
-<h2>Srovnání cen v obchodech</h2>{offer_rows(S, p)}<p class="muted" style="font-size:.85rem;margin-top:8px">Ceny za kus včetně DPH, bez dopravy a montáže. Aktualizujeme je několikrát týdně; před nákupem je ověřte v obchodě.</p>
+<h2>Srovnání cen v obchodech</h2>{offer_rows(S, p)}<p class="muted" style="font-size:.85rem;margin-top:8px">Ceny za kus včetně DPH, bez dopravy a montáže. Ceny aktualizujeme každý den; před nákupem je ověřte v obchodě.</p>
 </div></div><h2>O pneumatice</h2>{product_text(S, p)}{fits(S, p["dim"])}<h2>Parametry</h2>{table}{eu}{sizes}{alts}
 <div class="buybar" id="buybar" hidden><span>{R.kc(best["price"])}<small>{"nejlevněji ze " + R.shops_gen(n) if n > 1 else E(S.shops[best["shop"]]["name"])}</small></span><a class="btn" href="{E(best["go"])}" {S.go_attrs(best["shop"])}>Koupit u {E(S.shops[best["shop"]]["name"])}</a></div>"""
     title = f"{name} – cena od {R.kc(best['price'])} | auty.cz"
@@ -676,7 +676,7 @@ def dim_page(S, d, ps, season, dim_pages, dim_season, brand_dim, brand_name):
     if stats:
         qa.append((f"Kolik stojí {sname + ' ' if season else ''}pneumatiky {dl}?", " ".join(
             f"{T.SEASON_CZ[s].capitalize()} od {R.kc(v[0])}, polovina nabídek je do {R.kc(v[1])} za kus ({v[2]} modelů)." for s, v in stats.items() if not season or s == season)
-            + " Ceny jsou za kus včetně DPH a aktualizují se několikrát týdně."))
+            + " Ceny jsou za kus včetně DPH a aktualizují se každý den."))
     if lis:
         qa.append((f"Jaké indexy nosnosti a rychlosti se v rozměru {dl} prodávají nejčastěji?",
                    ", ".join(f"{k} ({c}×)" for k, c in lis) + ". Index nesmí být nižší, než uvádí technický průkaz vozu; u zimních pneumatik je povolen nižší rychlostní index (pak platí omezení rychlosti)."))
@@ -1398,7 +1398,7 @@ def llms_txt(products, dim_pages, by_brand, brand_name, articles, shops, present
     shop_names = ", ".join(s["name"] for s in shops if s["id"] in present)
     L = [f"# auty.cz", "",
          f"> Nezávislý srovnávač cen pneumatik pro Českou republiku. Porovnává {nf(len(products))} pneumatik (letní, zimní, celoroční; osobní, SUV, dodávky, moto) "
-         f"z {len(present)} českých e-shopů: {shop_names}. Ceny jsou za kus včetně DPH, aktualizují se několikrát týdně (naposledy {TODAY.isoformat()}).", "",
+         f"z {len(present)} českých e-shopů: {shop_names}. Ceny jsou za kus včetně DPH, aktualizují se každý den (naposledy {TODAY.isoformat()}).", "",
          "Každá stránka produktu ukazuje ceny stejné pneumatiky ve všech obchodech seřazené od nejlevnější, parametry (rozměr, index nosnosti a rychlosti, XL, run-flat, homologace) "
          "a štítek EU, pokud je známý. Odkazy do obchodů jsou affiliate; pořadí určuje jen cena.", "",
          "## Hlavní kategorie",
@@ -1478,7 +1478,7 @@ def home_body(S, products, dim_pages, by_brand, brand_name, articles):
 <h2>Podle sezóny</h2><ul class="scards">{scards}</ul>
 <h2>Značky</h2><div class="brands">{brands}</div><p style="margin-top:14px"><a class="lnk" href="/brandstore/">Všech {len(by_brand)} značek →</a></p>
 <h2>Disky, testy a rady</h2><ul class="pills"><li><a href="/alu-kola/">Alu kola</a></li><li><a href="/plechove-disky/">Plechové disky</a></li><li><a href="/roztec-kol/">Rozteč kol podle auta</a></li><li><a href="/levne-pneumatiky/">Levné pneumatiky</a></li><li><a href="/vyprodej-pneumatik/">Výprodej pneumatik</a></li><li><a href="/testy-pneumatik/">Testy pneumatik 2026</a></li><li><a href="/test-zimnich-pneumatik-2026/">Test zimních pneumatik</a></li><li><a href="/povinnost-zimnich-pneumatik/">Kdy mít zimní pneu</a></li><li><a href="/snehove-retezy/">Sněhové řetězy</a></li><li><a href="/prezuti-pneu-cena/">Cena přezutí</a></li><li><a href="/hloubka-dezenu/">Hloubka dezénu</a></li><li><a href="/eu-stitek-pneumatik/">Štítek EU</a></li></ul>
-<h2>Jak srovnáváme</h2><ol class="steps"><li><img src="/img/ic/pneu.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Stahujeme ceny</h3><p class="muted">Několikrát týdně načteme nabídky z českých e-shopů s pneumatikami.</p></div></li>
+<h2>Jak srovnáváme</h2><ol class="steps"><li><img src="/img/ic/pneu.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Stahujeme ceny</h3><p class="muted">Každý den obnovíme ceny a jednou týdně nabídky z českých e-shopů s pneumatikami.</p></div></li>
 <li><img src="/img/ic/cena.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Ověříme, že jde o stejný kus</h3><p class="muted">Porovnáváme jen opravdu stejnou pneumatiku — stejný vzorek, rozměr i indexy, ne jen podobný název.</p></div></li>
 <li><img src="/img/ic/obchod.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Vy vyberete obchod</h3><p class="muted">Kliknutím přejdete přímo do e-shopu. Cena je stejná, jako kdybyste tam šli sami.</p></div></li></ol>
 <h2>Rady k pneumatikám</h2><ul class="arts">{"".join(article_card(a) for a in articles[:3])}</ul></div>"""
@@ -1575,7 +1575,7 @@ def about_page(S, shops, present, offers):
     rows = "".join(f"<li><b>{E(s['name'])}</b> — {nf(cnt[s['id']])} nabídek</li>" for s in shops if s["id"] in present)
     body = f"""<div class="prose"><h1>Jak srovnáváme ceny pneumatik</h1>
 <p>auty.cz je nezávislý srovnávač cen pneumatik pro český trh. Neprodáváme, jen ukazujeme, kde je stejná pneumatika nejlevnější.</p>
-<h2>Odkud bereme ceny</h2><p>Několikrát týdně stáhneme produktové feedy těchto obchodů:</p><ul>{rows}</ul>
+<h2>Odkud bereme ceny</h2><p>Každý den stáhneme produktové feedy těchto obchodů:</p><ul>{rows}</ul>
 <p>Porovnáváme jen stejnou pneumatiku: musí sedět značka, vzorek, rozměr, index nosnosti a rychlosti i značení (XL, run-flat, homologace).</p>
 <h2>Jak na webu vyděláváme</h2><p>Odkazy do obchodů jsou affiliate: když nakoupíte, obchod nám zaplatí malou provizi. Na ceně pro vás se nic nemění a pořadí obchodů určuje jen cena — nejlevnější je vždy nahoře.</p>
 <h2>Kdo web provozuje</h2><p>auty.cz provozuje Ha Duy Huy, IČO 07876823, Praha — viz <a href="/kontakt/">kontakt a provozovatel</a>. Nejsme e-shop: nic neprodáváme a nevybíráme platby.</p>

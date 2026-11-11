@@ -2,6 +2,7 @@
 import gzip
 import hashlib
 import json
+import os
 import re
 from collections import defaultdict
 from difflib import SequenceMatcher
@@ -11,21 +12,43 @@ import tires as T
 
 APP = Path(__file__).resolve().parent.parent
 RAW = APP / "data/raw"
+WEEKLY = APP / "data/weekly"   # offers frozen by the last weekly (full) run: the product range changes only then
 STATE = APP / "data/state"
 
 # image quality preference (first non-empty wins)
 IMG_PREF = ["bestdrive", "nejvyhodnejsipneu", "dobrepneu", "pneuboss", "nejlevnejsipneu"]
 
 
+def full_mode():
+    """Full run: the range comes from the fresh feeds. Otherwise the range is the weekly snapshot and today's feeds only refresh price/link."""
+    return os.environ.get("AUTY_FULL") == "1" or not WEEKLY.exists()
+
+
+def todays_prices(path):
+    over = {}
+    if path.exists():
+        with gzip.open(path, "rt", encoding="utf-8") as f:
+            for line in f:
+                r = json.loads(line)
+                if float(r.get("p") or 0) > 0 and r.get("go"):
+                    over[r["id"]] = (r["p"], r["go"], r.get("url"))
+    return over
+
+
 def load_offers(shops):
     out = []
+    full = full_mode()
     for s in shops:
-        p = RAW / f"{s['id']}.jsonl.gz"
+        p = (RAW if full else WEEKLY) / f"{s['id']}.jsonl.gz"
         if not p.exists():
             continue
+        over = {} if full else todays_prices(RAW / f"{s['id']}.jsonl.gz")
         with gzip.open(p, "rt", encoding="utf-8") as f:
             for line in f:
                 rec = json.loads(line)
+                o = over.get(rec["id"])
+                if o:
+                    rec["p"], rec["go"], rec["url"] = o[0], o[1], o[2] or rec.get("url")
                 a = T.parse(rec)
                 if not a or a["vehicle"] == "other" or not a["brand"]:
                     continue

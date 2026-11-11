@@ -15,7 +15,7 @@ case "${1:-}" in
       echo "no previous state"
     fi ;;
   push)
-    tar cz data/state data/raw | openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -pass env:STATE_KEY -out /tmp/state.enc
+    tar cz data/state data/raw $([ -d data/weekly ] && echo data/weekly) | openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -pass env:STATE_KEY -out /tmp/state.enc
     gh release view state >/dev/null 2>&1 || gh release create state --title "build state (encrypted)" --notes "Encrypted catalogue state between builds. Not a software release." --latest=false
     gh release upload state /tmp/state.enc --clobber
     echo "state saved ($(du -h /tmp/state.enc | cut -f1))" ;;
