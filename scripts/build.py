@@ -22,6 +22,8 @@ import catalog as C
 import wheels as W  # noqa: E402
 import render as R  # noqa: E402
 import tires as T  # noqa: E402
+import studie as ST  # noqa: E402
+import studie_data as SD  # noqa: E402
 
 APP = Path(__file__).resolve().parent.parent
 DIST = APP / "dist"
@@ -333,6 +335,10 @@ def main():
         out.page(f"/{a['slug']}/", article_page(S, a, articles), "pages")
     out.page("/blog/", blog_page(S, articles), "pages")
     out.page("/testy-pneumatik/", tests_page(S, articles), "pages")
+    SITE = {"name": "auty.cz", "publisher": {"@type": "Organization", "name": "auty.cz", "@id": BASE + "/#org", "url": BASE + "/"}}
+    studies = ST.build(out, S, APP, BASE, SITE, {"zimni-pneumatiky-2026": SD.tyre_spread}, state.get("agg", {}), " | auty.cz", ("auty.cz", "/"), TODAY, log)
+    if studies:
+        log(f"studies: {studies}")
     out.page("/o-webu/", about_page(S, shops, present, offers), "pages")
     out.page("/kontakt/", contact_page(S), "pages")
     out.page("/ochrana-osobnich-udaju/", privacy_page(S), "pages")

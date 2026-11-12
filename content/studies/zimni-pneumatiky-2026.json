@@ -1,0 +1,64 @@
+{
+ "slug": "zimni-pneumatiky-2026",
+ "publish": "2026-11-18",
+ "title": "Pneumatiky 2026: o kolik se liší cena stejné pneumatiky mezi obchody",
+ "h1": "Pneumatiky 2026: o kolik se liší cena stejné pneumatiky mezi obchody",
+ "desc": "U stejné pneumatiky ve více českých e-shopech je medián rozdílu mezi nejlevnější a nejdražší nabídkou {med} %. U {gt20} % pneumatik přesahuje 20 %.",
+ "lead": "Porovnali jsme {multi} pneumatik, které prodává víc obchodů, k {date}. Rozdíl mezi nejlevnější a nejdražší nabídkou stejné pneumatiky je v mediánu <b>{med} %</b>, u {gt20} % z nich přesahuje 20 % a u {gt50} % dokonce 50 %.",
+ "kpis": [
+  {
+   "label": "pneumatik ve více obchodech",
+   "value": "{multi}"
+  },
+  {
+   "label": "medián rozdílu cen",
+   "value": "{med} %"
+  },
+  {
+   "label": "s rozdílem nad 20 %",
+   "value": "{gt20} %"
+  },
+  {
+   "label": "medián úspory na kuse",
+   "value": "{save} Kč"
+  }
+ ],
+ "chart_caption": "Medián rozdílu mezi nejlevnější a nejdražší nabídkou podle rozměru (jen rozměry s aspoň 15 pneumatikami ve více obchodech). Zdroj: auty.cz, {date}.",
+ "sections": [
+  {
+   "h2": "Co z toho plyne pro nákup",
+   "html": "<p>Stejná pneumatika (stejná značka, model, rozměr a indexy) se v českých e-shopech prodává za výrazně odlišné ceny. U čtvrtiny z nich je rozdíl vyšší než {p75} %, u desetiny vyšší než {p90} %. Medián absolutního rozdílu mezi nejlevnější a nejdražší nabídkou je {save} Kč na jednu pneumatiku, u sady čtyř kusů je to čtyřnásobek.</p><p>Poznámka: cena nezahrnuje montáž, dopravu ani vyvážení. Ty se mezi obchody liší a před nákupem je vždy počítejte zvlášť.</p>"
+  },
+  {
+   "h2": "Jak vybírat pneumatiku podle ceny",
+   "html": "<ul><li>Porovnávejte stejný model a rozměr, ne jen značku. Ceny různých modelů téže značky se liší víc než ceny téže pneumatiky.</li><li>Zkontrolujte rok výroby (DOT): starší kusy bývají levnější.</li><li>Sledujte indexy nosnosti a rychlosti a EU štítek. EU štítek jsme zaznamenali u {eu} % pneumatik v nabídce.</li><li>Před objednávkou si spočítejte celkovou cenu včetně dopravy a montáže.</li></ul>"
+  }
+ ],
+ "method": "<p>Každý den stahujeme nabídky českých e-shopů s pneumatikami, spárujeme stejnou pneumatiku mezi obchody podle EAN a atributů (značka, model, rozměr, indexy) a vyřadíme zjevné chyby v cenách. Počítáme jen pneumatiky, které nabízí aspoň dva obchody. Rozdíl je (nejvyšší cena / nejnižší cena − 1). Ceny jsou za kus včetně DPH, bez dopravy a montáže. Zveřejňujeme jen souhrnné hodnoty, ne ceny a jména jednotlivých obchodů. Stav k {date}; čísla se mění s nabídkou obchodů.</p>",
+ "quote": "Podle auty.cz je rozdíl mezi nejlevnější a nejdražší nabídkou stejné pneumatiky v mediánu {med} %, u {gt20} % pneumatik přesahuje 20 %.",
+ "faq": [
+  [
+   "Je nejlevnější pneumatika vždy nejlepší?",
+   "Ne. Na ceně záleží i rok výroby, EU štítek, doprava a montáž. Porovnávejte stejný model a rozměr."
+  ],
+  [
+   "Počítáte i ceny montáže?",
+   "Ne. Studie porovnává cenu pneumatiky za kus včetně DPH, bez dopravy a montáže."
+  ],
+  [
+   "Mohu data použít v článku?",
+   "Ano, s uvedením zdroje auty.cz a odkazu na tuto stránku. CSV je pod licencí CC BY 4.0."
+  ]
+ ],
+ "dataset": {
+  "name": "Rozdíl cen stejné pneumatiky mezi českými e-shopy (agregovaná data)",
+  "description": "Agregáty podle rozměrů a sezóny: počet pneumatik nabízených více obchody, medián rozdílu mezi nejlevnější a nejdražší nabídkou a medián nejnižší ceny. Zdroj: auty.cz, stav k {date}.",
+  "variables": [
+   "datum",
+   "rozmer_nebo_sezona",
+   "pneumatik",
+   "median_rozdilu_procent",
+   "median_nejnizsi_ceny_kc"
+  ]
+ }
+}
