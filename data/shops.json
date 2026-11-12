@@ -37,7 +37,11 @@
       "network": "affiliateport",
       "offer": 226,
       "asset": 347,
-      "feed": "https://www.nejlevnejsipneu.cz/export/5dmgooglecz.php"
+      "feed": "https://www.nejlevnejsipneu.cz/export/5dmgooglecz.php",
+      "logo": "/img/shops/nejlevnejsipneu.webp",
+      "lw": 252,
+      "lh": 45,
+      "logo_src": 25751
     },
     {
       "id": "nejvyhodnejsipneu",
@@ -46,7 +50,11 @@
       "network": "affiliateport",
       "offer": 465,
       "asset": 1507,
-      "feed": "https://www.nejvyhodnejsipneu.cz/exporty/feed-heureka.xml"
+      "feed": "https://www.nejvyhodnejsipneu.cz/exporty/feed-heureka.xml",
+      "logo": "/img/shops/nejvyhodnejsipneu.webp",
+      "lw": 117,
+      "lh": 120,
+      "logo_src": 22937
     },
     {
       "id": "tirendo",
@@ -124,7 +132,11 @@
       "feed_key": "alukola",
       "enabled": true,
       "note": "alloy wheels only (14k items, ~20 tyres): feeds /alu-kola/, ignored by the tyre catalogue",
-      "kind": "wheels"
+      "kind": "wheels",
+      "logo": "/img/shops/alukola.webp",
+      "lw": 315,
+      "lh": 120,
+      "logo_src": 17745
     },
     {
       "id": "allegro",

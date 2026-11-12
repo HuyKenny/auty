@@ -1584,6 +1584,7 @@ def about_page(S, shops, present, offers):
     body = f"""<div class="prose"><h1>Jak srovnáváme ceny pneumatik</h1>
 <p>auty.cz je nezávislý srovnávač cen pneumatik pro český trh. Neprodáváme, jen ukazujeme, kde je stejná pneumatika nejlevnější.</p>
 <h2>Odkud bereme ceny</h2><p>Každý den stáhneme produktové feedy těchto obchodů:</p><ul>{rows}</ul>
+<p class="muted">Loga a názvy obchodů patří jejich majitelům a uvádíme je jen k označení obchodu, jehož nabídku porovnáváme. Nejde o oficiální doporučení ani partnerství. Odstranění loga na žádost: <a href="/kontakt/">kontakt</a>.</p>
 <p>Porovnáváme jen stejnou pneumatiku: musí sedět značka, vzorek, rozměr, index nosnosti a rychlosti i značení (XL, run-flat, homologace).</p>
 <h2>Jak na webu vyděláváme</h2><p>Odkazy do obchodů jsou affiliate: když nakoupíte, obchod nám zaplatí malou provizi. Na ceně pro vás se nic nemění a pořadí obchodů určuje jen cena — nejlevnější je vždy nahoře.</p>
 <h2>Kdo web provozuje</h2><p>auty.cz provozuje Ha Duy Huy, IČO 07876823, Praha — viz <a href="/kontakt/">kontakt a provozovatel</a>. Nejsme e-shop: nic neprodáváme a nevybíráme platby.</p>
