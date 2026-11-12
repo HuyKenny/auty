@@ -4,7 +4,9 @@ import hashlib
 import json
 import os
 import re
+import statistics
 from collections import defaultdict
+from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
 
@@ -205,6 +207,34 @@ def assign_slugs(products, state, old_slugs, log):
     log(f"slugs: {matched} old auty.cz URLs matched, {new} new")
     for p in products:
         p["slug"] = slugs[p["id"]]
+
+
+def collect_study_data(products, state):
+    """Daily aggregates for the data study (price spread between shops for the SAME tyre = same EAN/attributes). Aggregates only: the public repo
+    and the study never carry shop-level prices or shop names. One entry per day, idempotent for the same day."""
+    day = date.today().toordinal()
+    agg = state.setdefault("agg", {})
+    multi = [p for p in products if len(p["offers"]) >= 2]
+    sp = lambda p: p["offers"][-1]["price"] / p["offers"][0]["price"] - 1       # offers are sorted by price: last = dearest
+    spreads = sorted(sp(p) for p in multi)
+    q = lambda xs, f: round(xs[min(len(xs) - 1, int(len(xs) * f))] * 100, 1) if xs else 0
+    seasons = {}
+    for p in multi:
+        seasons.setdefault(p["season"], []).append(p)
+    by_season = {k: [len(v), q(sorted(sp(p) for p in v), 0.5), int(statistics.median(p["price"] for p in v))] for k, v in seasons.items()}
+    sizes = defaultdict(list)
+    for p in multi:
+        sizes[f'{p["w"]}/{p["p"]} R{p["r"]}'].append(p)
+    top = sorted(sizes.items(), key=lambda kv: -len(kv[1]))[:25]
+    agg[str(day)] = {"n": len(products), "multi": len(multi), "med": q(spreads, 0.5), "p75": q(spreads, 0.75), "p90": q(spreads, 0.9),
+                     "gt10": round(sum(1 for x in spreads if x > 0.10) / max(1, len(spreads)) * 100, 1), "gt20": round(sum(1 for x in spreads if x > 0.20) / max(1, len(spreads)) * 100, 1),
+                     "gt50": round(sum(1 for x in spreads if x > 0.50) / max(1, len(spreads)) * 100, 1),
+                     "save_med": int(statistics.median(p["offers"][-1]["price"] - p["offers"][0]["price"] for p in multi)) if multi else 0,
+                     "eu": round(sum(1 for p in products if p.get("eu")) / max(1, len(products)) * 100, 1), "season": by_season,
+                     "sizes": [[k, len(v), q(sorted(sp(p) for p in v), 0.5), int(statistics.median(p["price"] for p in v))] for k, v in top]}
+    for k in list(agg):
+        if int(k) < day - 400:
+            agg.pop(k)
 
 
 def load_state():

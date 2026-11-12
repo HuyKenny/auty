@@ -135,6 +135,7 @@ def main():
             p["price"] = keep[0]["price"]
     products = [p for p in products if p["offers"]]
     log(f"price sanity: dropped {dropped} offers (price errors)")
+    C.collect_study_data(products, state)
     old_slugs = [u.rstrip("/").rsplit("/", 1)[1] for u in (APP / "data/old-urls.txt").read_text().split() if "/produkt/" in u]
     C.assign_slugs(products, state, old_slugs, log)
     present = {o["shop"] for o in offers}
