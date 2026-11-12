@@ -1241,7 +1241,8 @@ def home_page(S, products, dim_pages, by_brand, brand_name, articles):
                     body, jsonld=[{"@context": "https://schema.org", "@type": "WebSite", "name": "auty.cz", "alternateName": "auty.cz – srovnání cen pneumatik", "url": BASE + "/", "inLanguage": "cs-CZ",
                              "publisher": {"@id": BASE + "/#org"}},
                             {"@context": "https://schema.org", "@type": "Organization", "@id": BASE + "/#org", "name": "auty.cz", "url": BASE + "/",
-                             "logo": BASE + "/img/ui/logo-192.webp", "description": "Nezávislý srovnávač cen pneumatik pro český trh."}], full=True, preload_img="/img/ui/hero-640.webp")
+                             "logo": BASE + "/img/ui/logo-192.webp", "description": "Nezávislý srovnávač cen pneumatik pro český trh.",
+                             "founder": {"@type": "Person", "@id": "https://huy.cz/#kenny", "name": "Ha Duy Huy", "alternateName": "Kenny", "url": "https://huy.cz/", "jobTitle": "SEO konzultant"}}], full=True, preload_img="/img/ui/hero-640.webp")
 
 
 CAR_NOTE = ("Rozměry jsou tovární podle výrobce pro běžné verze. Vaše auto může mít jiná kola — vždy si rozměr ověřte "
@@ -1604,7 +1605,7 @@ def contact_page(S):
 <li>Žádost o odstranění nebo opravu údajů na webu.</li>
 <li>Spolupráce a nabídky obchodů — viz níže.</li></ul>
 <h2>Spolupráce</h2>
-<p>Chcete s námi spolupracovat — obchod s pneumatikami nebo disky, partnerský program, reklama či obsah? Napište na <a href="mailto:{o["email"]}">{o["email"]}</a> nebo se podívejte na <a href="https://huy.cz" rel="noopener" target="_blank">huy.cz</a>, kde najdete nabídku spolupráce.</p>
+<p>Chcete s námi spolupracovat — obchod s pneumatikami nebo disky, partnerský program, reklama či obsah? Napište na <a href="mailto:{o["email"]}">{o["email"]}</a> nebo se podívejte na <a href="https://huy.cz/" rel="nofollow noopener" target="_blank">huy.cz</a>, kde najdete nabídku spolupráce.</p>
 <h2>Čím se auty.cz zabývá a čím ne</h2>
 <p>auty.cz je nezávislý srovnávač cen pneumatik a kol. <b>Nic neprodáváme</b>, nevybíráme platby a neuzavíráme s vámi kupní smlouvu — nákup probíhá v e-shopu, na který vás odkážeme. Reklamace, vrácení zboží a dopravu proto řešíte s prodejcem. Jak srovnáváme a jak web vydělává, popisuje stránka <a href="/o-webu/">Jak srovnáváme</a>; zacházení s údaji najdete v <a href="/ochrana-osobnich-udaju/">zásadách ochrany osobních údajů</a>.</p></div>"""
     return S.layout("/kontakt/", "Kontakt a provozovatel | auty.cz", "Provozovatel srovnávače auty.cz: Ha Duy Huy, IČO 07876823, Praha. Kontakt, datová schránka a údaje o fungování webu.",
