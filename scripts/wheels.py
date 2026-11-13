@@ -111,7 +111,7 @@ def load(shops):
                 x = parse(json.loads(line))
                 if not x:
                     continue
-                off = {"shop": s["id"], "price": x["price"], "go": x["go"]}
+                off = {"shop": s["id"], "price": x["price"], "go": x["go"], "url": x["url"]}
                 if x["ean"] and x["ean"] in by_ean:
                     y = by_ean[x["ean"]]
                     if all(o["shop"] != s["id"] for o in y["offers"]):

@@ -20,6 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import catalog as C
 import wheels as W  # noqa: E402
+import golinks as GL  # noqa: E402
 import render as R  # noqa: E402
 import tires as T  # noqa: E402
 import studie as ST  # noqa: E402
@@ -136,6 +137,7 @@ def main():
         if keep:
             p["price"] = keep[0]["price"]
     products = [p for p in products if p["offers"]]
+    go_tpl, _go_stats = GL.local_go(products + [{"offers": x["offers"]} for x in wheels])
     log(f"price sanity: dropped {dropped} offers (price errors)")
     C.collect_study_data(products, state)
     old_slugs = [u.rstrip("/").rsplit("/", 1)[1] for u in (APP / "data/old-urls.txt").read_text().split() if "/produkt/" in u]
@@ -230,6 +232,7 @@ def main():
     js_name = f"app.{hashlib.md5(js).hexdigest()[:8]}.js"
     out.write("assets/" + css_name, css)
     out.write("assets/" + js_name, js)
+    GL.write_go(out, go_tpl, shop_meta)
 
     stats = {"products": len(products), "shops": len(present), "offers": len(offers), "brands": len(by_brand), "shop_ids": sorted(present)}
     S = R.Site(BASE, ENV, GA4, css_name, js_name, shop_meta, TODAY_CZ, stats)
@@ -389,13 +392,13 @@ def main():
               + "".join(f"<sitemap><loc>{BASE}/{n}</loc><lastmod>{TODAY.isoformat()}</lastmod></sitemap>" for n in sm_files) + "</sitemapindex>")
     if ENV == "production":
         ai = "".join(f"User-agent: {u}\n" for u in ("OAI-SearchBot", "ChatGPT-User", "PerplexityBot", "Perplexity-User", "Claude-SearchBot", "Claude-User"))
-        out.write("robots.txt", f"User-agent: *\nDisallow: /data/\n\n# AI search and answer engines: welcome (cite us)\n{ai}Allow: /\nDisallow: /data/\n\n"
+        out.write("robots.txt", f"User-agent: *\nDisallow: /data/\nDisallow: /go/\n\n# AI search and answer engines: welcome (cite us)\n{ai}Allow: /\nDisallow: /data/\nDisallow: /go/\n\n"
                                 f"Sitemap: {BASE}/sitemap_index.xml\n")
         out.write("llms.txt", llms_txt(products, dim_pages, by_brand, brand_name, articles, shops, present))
     else:
         out.write("robots.txt", "User-agent: *\nDisallow: /\n")
     out.write("_redirects", redirects_file(products, old_slugs, dim_pages, brand_dim))
-    out.write("_headers", "/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=3600\n  X-Robots-Tag: noindex\n"
+    out.write("_headers", "/go/*\n  X-Robots-Tag: noindex, nofollow\n/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/data/*\n  Cache-Control: public, max-age=3600\n  X-Robots-Tag: noindex\n"
               "/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n"
               "/img/*\n  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000\n"
               "/favicon*\n  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000\n"

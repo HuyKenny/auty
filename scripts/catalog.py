@@ -124,7 +124,7 @@ def cluster(offers):
             "xl": any(a["xl"] for a in offs), "rf": any(a["rf"] for a in offs), "hom": sorted({h for a in offs for h in a["hom"]}),
             "ev": any(a["ev"] for a in offs), "pmsf": any(a["pmsf"] for a in offs), "ms": any(a["ms"] for a in offs),
             "c": any(a["c"] for a in offs), "eu": eu, "img": img,
-            "offers": [{"shop": a["shop"], "price": a["price"], "go": a["go"], "dot": a.get("dot")} for a in shop_offers],
+            "offers": [{"shop": a["shop"], "price": a["price"], "go": a["go"], "url": a.get("url") or "", "dot": a.get("dot")} for a in shop_offers],
             "price": shop_offers[0]["price"],
         })
     return products

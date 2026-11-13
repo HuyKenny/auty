@@ -7,7 +7,7 @@ from collections import Counter
 import tires as T
 
 E = html.escape
-SPECULATION = ('<script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/data/*"}},'
+SPECULATION = ('<script type="speculationrules">{"prerender":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/data/*"}},{"not":{"href_matches":"/go/*"}},'
                '{"not":{"href_matches":"/*\\\\?*"}},{"not":{"selector_matches":"[rel~=nofollow],[target=_blank],[download]"}}]},"eagerness":"moderate"}]}</script>')
 SHOP_COLORS = ["#0B57B7", "#F7931E", "#1E7A4C", "#7A4BD1", "#D7262E", "#0E7490", "#B45309", "#334155", "#BE123C"]
 SEASON_IMG = {"summer": "letni", "winter": "zimni", "all": "celorocni"}
