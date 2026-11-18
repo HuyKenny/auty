@@ -247,6 +247,8 @@ def main():
     S.dim_season = set(dim_season)
     S.brand_dim = set(brand_dim)
     S.dim_set = set(dim_pages)                        # size pages that exist (>= 2 products): never link to the others
+    S.dim_low = {d: low(ps) for d, ps in dim_pages.items()}       # {{d:...}} tokens in articles: live "from X Kč"
+    S.dim_season_low = {(d, T.SEASON_SLUG[s]): low(ps) for (d, s), ps in dim_season.items()}
     S.specials = set(specials)
     S.wheel_n = {"alu": sum(1 for x in wheels if not x["steel"]), "steel": sum(1 for x in wheels if x["steel"])}
     S.car_wheels = json.load(open(APP / "data/car_wheels.json"))["wheels"]
@@ -755,6 +757,15 @@ BRAND_INFO = {  # slug: (country, group, one-line note)
 }
 
 
+_KR = ("/korejske-pneumatiky-hankook-kumho-nexen/", "korejské pneumatiky Hankook, Kumho a Nexen")
+_CN = ("/cinske-pneumatiky/", "čínské pneumatiky – výrobci a testy")
+_WHO = ("/kdo-vyrabi-pneumatiky/", "kdo vyrábí levné značky pneumatik")
+BRAND_ARTICLE = {"tomket": ("/pneumatiky-tomket-recenze/", "Tomket – recenze, výrobce a testy"), "laufenn": ("/pneumatiky-laufenn-recenze/", "Laufenn – recenze, výrobce a testy"),
+                 "barum": ("/pneumatiky-barum-recenze/", "Barum – recenze a testy"), "hankook": _KR, "kumho": _KR, "nexen": _KR,
+                 **{b: _CN for b in ("linglong", "triangle", "sailun", "goodride", "westlake", "tracmax", "rotalla", "aplus", "firemax", "imperial", "zeetex")},
+                 **{b: _WHO for b in ("matador", "semperit", "uniroyal", "kormoran", "riken", "sebring", "tigar", "sava", "debica", "fulda", "kleber", "general-tire", "gislaved")}}
+
+
 def brand_page(S, b, ps, by_model, brand_dim, mstate, model_url):
     brand = ps[0]["brand"]
     models = defaultdict(list)
@@ -773,6 +784,9 @@ def brand_page(S, b, ps, by_model, brand_dim, mstate, model_url):
         top_m = ", ".join(E(x[0]["model"]) for x in ml[:4])
         body += (f'<div class="bprof"><p><b>{E(brand)}</b> je {({"p": "prémiová značka", "m": "značka střední třídy", "b": "levná značka"})[R.tier(b)]} pneumatik ({country}{", " + group if group else ""}). {note}</p>'
                  f'<p class="muted">Nejvíc rozměrů u nás mají vzorky {top_m}.</p></div>')
+    if b in BRAND_ARTICLE:
+        u, txt = BRAND_ARTICLE[b]
+        body += f'<p class="muted">Kdo značku vyrábí a jak dopadla v testech: <a href="{u}">{txt}</a>.</p>'
     bs = [(x, n) for x, n in seas.most_common() if (b, x) in getattr(S, "brand_season", ())]
     if bs:
         body += '<ul class="pills" style="margin:0 0 14px">' + "".join(
@@ -1021,8 +1035,8 @@ def hub_page(S, slug, items, dim_pages, dim_season, season, vehicle, brand_name,
     extra = []
     if season:
         extra.append((f"/levne-pneumatiky/{ss}/", f"Levné {T.SEASON_CZ[season]} pneumatiky"))
-    extra += {"winter": [("/test-zimnich-pneumatik-2026/", "Test zimních pneumatik 2026"), ("/snehove-retezy/", "Sněhové řetězy"), ("/3pmsf-m-s-znaceni/", "M+S a vločka 3PMSF")],
-              "all": [("/test-celorocnich-pneumatik-2026/", "Test celoročních pneumatik 2026")],
+    extra += {"winter": [("/test-zimnich-pneumatik-2026/", "Test zimních pneumatik 2026"), ("/snehove-retezy/", "Sněhové řetězy"), ("/3pmsf-m-s-znaceni/", "M+S a vločka 3PMSF"), ("/zimni-pneumatiky-v-zahranici/", "Zimní pneu v zahraničí")],
+              "all": [("/test-celorocnich-pneumatik-2026/", "Test celoročních pneumatik 2026"), ("/jak-poznat-zimni-pneumatiky/", "Jak poznat celoroční pneu")],
               "summer": [("/test-letnich-pneumatik-2026/", "Test letních pneumatik 2026")]}.get(season, [])
     extra += [("/testy-pneumatik/", "Testy pneumatik 2026"), ("/eu-stitek-pneumatik/", "Štítek EU"), ("/hloubka-dezenu/", "Hloubka dezénu"), ("/tlak-v-pneumatikach/", "Tlak v pneumatikách"), ("/pneumatiky-podle-auta/", "Pneumatiky podle auta"), ("/najdi-pneumatiky/", "Průvodce výběrem"), ("/run-flat-pneumatiky/", "Run-flat"),
               ("/pneumatiky-pro-elektromobily/", "Pro elektromobily"), ("/vyprodej-pneumatik/", "Výprodej")]
@@ -1488,7 +1502,7 @@ def home_body(S, products, dim_pages, by_brand, brand_name, articles):
 <h2>Pneumatiky podle rozměru a sezóny</h2><p class="muted" style="margin-top:-.4em">Nejčastější rozměry rovnou v letní, zimní a celoroční verzi.</p><div class="sizeseas">{size_season}</div>
 <h2>Podle sezóny</h2><ul class="scards">{scards}</ul>
 <h2>Značky</h2><div class="brands">{brands}</div><p style="margin-top:14px"><a class="lnk" href="/brandstore/">Všech {len(by_brand)} značek →</a></p>
-<h2>Disky, testy a rady</h2><ul class="pills"><li><a href="/alu-kola/">Alu kola</a></li><li><a href="/plechove-disky/">Plechové disky</a></li><li><a href="/roztec-kol/">Rozteč kol podle auta</a></li><li><a href="/levne-pneumatiky/">Levné pneumatiky</a></li><li><a href="/vyprodej-pneumatik/">Výprodej pneumatik</a></li><li><a href="/testy-pneumatik/">Testy pneumatik 2026</a></li><li><a href="/test-zimnich-pneumatik-2026/">Test zimních pneumatik</a></li><li><a href="/povinnost-zimnich-pneumatik/">Kdy mít zimní pneu</a></li><li><a href="/snehove-retezy/">Sněhové řetězy</a></li><li><a href="/prezuti-pneu-cena/">Cena přezutí</a></li><li><a href="/hloubka-dezenu/">Hloubka dezénu</a></li><li><a href="/eu-stitek-pneumatik/">Štítek EU</a></li></ul>
+<h2>Disky, testy a rady</h2><ul class="pills"><li><a href="/alu-kola/">Alu kola</a></li><li><a href="/plechove-disky/">Plechové disky</a></li><li><a href="/roztec-kol/">Rozteč kol podle auta</a></li><li><a href="/levne-pneumatiky/">Levné pneumatiky</a></li><li><a href="/vyprodej-pneumatik/">Výprodej pneumatik</a></li><li><a href="/testy-pneumatik/">Testy pneumatik 2026</a></li><li><a href="/test-zimnich-pneumatik-2026/">Test zimních pneumatik</a></li><li><a href="/povinnost-zimnich-pneumatik/">Kdy mít zimní pneu</a></li><li><a href="/snehove-retezy/">Sněhové řetězy</a></li><li><a href="/prezuti-pneu-cena/">Cena přezutí</a></li><li><a href="/hloubka-dezenu/">Hloubka dezénu</a></li><li><a href="/eu-stitek-pneumatik/">Štítek EU</a></li><li><a href="/jak-vybrat-pneumatiky/">Jak vybrat pneumatiky</a></li><li><a href="/kolik-stoji-pneumatiky/">Kolik stojí pneumatiky</a></li><li><a href="/zimni-pneumatiky-v-zahranici/">Zimní pneu v zahraničí</a></li><li><a href="/geometrie-kol/">Geometrie kol</a></li><li><a href="/kdo-vyrabi-pneumatiky/">Kdo vyrábí pneumatiky</a></li></ul>
 <h2>Jak srovnáváme</h2><ol class="steps"><li><img src="/img/ic/pneu.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Stahujeme ceny</h3><p class="muted">Každý den obnovíme ceny a jednou týdně nabídky z českých e-shopů s pneumatikami.</p></div></li>
 <li><img src="/img/ic/cena.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Ověříme, že jde o stejný kus</h3><p class="muted">Porovnáváme jen opravdu stejnou pneumatiku — stejný vzorek, rozměr i indexy, ne jen podobný název.</p></div></li>
 <li><img src="/img/ic/obchod.webp" alt="" width="64" height="64" loading="lazy"><div><h3>Vy vyberete obchod</h3><p class="muted">Kliknutím přejdete přímo do e-shopu. Cena je stejná, jako kdybyste tam šli sami.</p></div></li></ol>
@@ -1501,6 +1515,7 @@ def article_card(a):
 
 
 MODEL_REF = re.compile(r"\{\{m:([^|}]+)\|([^}]+)\}\}")
+DIM_REF = re.compile(r"\{\{d:([^|}]+)\|([^}]+)\}\}")
 BRAND_ALIAS = {"nokian": ["nokian-tyres", "nokian"], "gt-radial": ["gt-radial", "gtradial"], "bfgoodrich": ["bfgoodrich", "bf-goodrich"]}
 
 
@@ -1520,7 +1535,16 @@ def resolve_models(S, html):
             if hit:
                 return f'<a href="{hit[0]}">{E(name)}</a> <small class="muted">od {R.kc(hit[1])}</small>'
         return E(name)
-    return MODEL_REF.sub(one, html)
+
+    def dim(m):
+        """{{d:205-55-r16|205/55 R16}} or {{d:205-55-r16/zimni|...}} -> link to our size page with the current lowest price."""
+        ref, label = m.group(1).strip().strip("/"), m.group(2).strip()
+        d, _, ss = ref.partition("/")
+        price = getattr(S, "dim_season_low", {}).get((d, ss)) if ss else getattr(S, "dim_low", {}).get(d)
+        if price is None:
+            return E(label)
+        return f'<a href="/pneumatiky/{d}/{ss + "/" if ss else ""}">{E(label)}</a> <small class="muted">od {R.kc(price)}</small>'
+    return DIM_REF.sub(dim, MODEL_REF.sub(one, html))
 
 
 
@@ -1565,15 +1589,19 @@ def article_page(S, a, articles):
     d = a["date"][:10]
     y, m, dd = d.split("-")
     img = f'<p class="hero-img"><img src="{a["image"]}" alt="{E(a["title"])}" width="1024" height="683" fetchpriority="high"></p>' if a.get("image") else ""
-    others = [x for x in articles if x["slug"] != a["slug"]][:3]
-    body = (f'<div class="artpage"><article class="prose"><h1>{E(a["title"])}</h1><p class="muted">{int(dd)}. {int(m)}. {y}</p>{img}{resolve_models(S, a["html"])}</article>'
+    bys = {x["slug"]: x for x in articles}
+    others = [bys[s] for s in a.get("related", []) if s in bys and s != a["slug"]][:3]
+    others += [x for x in articles if x["slug"] != a["slug"] and x not in others][:3 - len(others)]
+    faq_html, faq_ld = S.faq([tuple(q) for q in a.get("faq", [])])
+    body = (f'<div class="artpage"><article class="prose"><h1>{E(a["title"])}</h1><p class="muted">{int(dd)}. {int(m)}. {y}</p>{img}{resolve_models(S, a["html"])}{faq_html}</article>'
             f'{S.size_picker(title="Hledáte pneumatiky? Zadejte rozměr")}<h2>Další články</h2><ul class="arts">{"".join(article_card(x) for x in others)}</ul></div>')
     ld = {"@context": "https://schema.org", "@type": "Article", "headline": a["title"], "datePublished": a["date"], "dateModified": a["modified"],
           "author": {"@type": "Organization", "name": "Redakce auty.cz", "url": BASE + "/o-webu/"},
           "publisher": {"@type": "Organization", "name": "auty.cz", "@id": BASE + "/#org"}, "mainEntityOfPage": BASE + f"/{a['slug']}/", "inLanguage": "cs-CZ"}
     if a.get("image"):
         ld["image"] = BASE + a["image"]
-    return S.layout(f"/{a['slug']}/", f"{a['title']} | auty.cz", a["excerpt"][:155], body, [("auty.cz", "/"), ("Rady", "/blog/"), (a["title"], f"/{a['slug']}/")], jsonld=[ld])
+    return S.layout(f"/{a['slug']}/", f"{a['title']} | auty.cz", a["excerpt"][:155], body, [("auty.cz", "/"), ("Rady", "/blog/"), (a["title"], f"/{a['slug']}/")],
+                    jsonld=[ld] + ([faq_ld] if faq_ld else []))
 
 
 def blog_page(S, articles):
